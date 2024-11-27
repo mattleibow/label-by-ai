@@ -31,6 +31,44 @@ public class GitHubRepository(Connection connection, string owner, string repo)
         return issue;
     }
 
+    public async Task<GitHubIssue> GetIssueDetailedAsync(int number)
+    {
+        var issue = await GetIssueAsync(number);
+        if (issue.Comments is null)
+        {
+            var comments = await FetchIssueCommentsAsync(number);
+            issue.Comments = comments;
+        }
+
+        return issue;
+    }
+
+    private async Task<List<GitHubComment>> FetchIssueCommentsAsync(int number)
+    {
+        var query = new Query()
+            .Repository(owner: owner, name: repo)
+            .Issue(number: number)
+            .Select(i =>
+                i.Comments(null, null, null, null, null)
+                    .AllPages()
+                    .Select(c => new GitHubComment(
+                        c.Id.ToString(),
+                        c.Author.Login,
+                        c.Author.ResourcePath,
+                        c.Body,
+                        c.CreatedAt,
+                        c.Reactions(null, null, null, null, null, null)
+                            .TotalCount
+                    ))
+                    .ToList()
+            )
+            .Compile();
+
+        var comments = await connection.Run(query);
+
+        return comments;
+    }
+
     private async Task<List<GitHubLabel>> FetchLabelsAsync()
     {
         var query = new Query()
@@ -40,7 +78,9 @@ public class GitHubRepository(Connection connection, string owner, string repo)
             .Select(label => new GitHubLabel(
                 label.Id.ToString(),
                 label.Name,
-                label.Description
+                label.Description,
+                label.Issues(null, null, null, null, null, null, null, null)
+                    .TotalCount
             ))
             .Compile();
 
@@ -54,11 +94,22 @@ public class GitHubRepository(Connection connection, string owner, string repo)
         var query = new Query()
             .Repository(owner: owner, name: repo)
             .Issue(number: number)
-            .Select(label => new GitHubIssue(
-                label.Id.ToString(),
-                label.Number,
-                label.Title,
-                label.Body
+            .Select(i => new GitHubIssue(
+                i.Id.ToString(),
+                i.Number,
+                i.Author.Login,
+                i.Title,
+                i.Body,
+                i.Comments(null, null, null, null, null)
+                    .TotalCount,
+                i.Reactions(null, null, null, null, null, null)
+                    .TotalCount,
+                i.UpdatedAt,
+                i.CreatedAt,
+                i.Labels(null, null, null, null, null)
+                    .AllPages()
+                    .Select(l => l.Name)
+                    .ToList()
             ))
             .Compile();
 

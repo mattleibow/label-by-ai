@@ -55,3 +55,33 @@ X-GitHub-Token: {{GitHubToken}}
 }
 
 ###
+
+POST {{HostAddress}}/api/engagement-score
+Content-Type: application/json
+X-GitHub-Token: {{GitHubToken}}
+
+{
+  "version": 1,
+  "issue": {
+    "owner": "mono",
+    "repo": "SkiaSharp",
+    "number": 3068
+  }
+}
+
+###
+
+POST {{HostAddress}}/api/engagement-score
+Content-Type: application/json
+X-GitHub-Token: {{GitHubToken}}
+
+{
+  "version": 1,
+  "issue": {
+    "owner": "mattleibow",
+    "repo": "labeled-by-ai",
+    "number": 1
+  }
+}
+
+###
