@@ -1,0 +1,8 @@
+<Project>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+		<UseLocalAI>false</UseLocalAI>
+		<DefineConstants Condition="'$(UseLocalAI)' == 'true'">$(DefineConstants);USE_LOCAL_AI</DefineConstants>
+	</PropertyGroup>
+
+</Project>

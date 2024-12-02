@@ -118,7 +118,7 @@ public class GitHubRepository(Connection connection, string owner, string repo)
         return issue;
     }
 
-    private IList<GitHubLabel> GetFilteredLabels(GitHubLabelFilter filter)
+    private List<GitHubLabel> GetFilteredLabels(GitHubLabelFilter filter)
     {
         if (_allLabels is null)
             throw new InvalidOperationException("Trying to filter issues before the issues are loaded.");
